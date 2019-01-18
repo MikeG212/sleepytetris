@@ -11,6 +11,8 @@ let colorMap = {
     8: "pink"
 
 }
+
+let scoreBoard = document.getElementById('scoreBoard');
 let gameRunning = true;
 
 let shapes = {
@@ -117,6 +119,7 @@ document.onkeydown = function (e) {
     switch (e.keyCode) {
         case 40:
             direction = "down";
+            score++;
             break;
         case 37:
             direction = "left";
@@ -131,6 +134,7 @@ document.onkeydown = function (e) {
             break;
     }
     moveShapes(direction)
+    scoreBoard.innerHTML = `Score: ${score}`;
     drawWorld();
 }
 
@@ -174,6 +178,7 @@ function createShape() {
 }
 
 function drawWorld() {
+    scoreBoard.innerHTML = `Score: ${score}`;
     while (world.lastChild) {
         world.removeChild(world.lastChild);
     }
@@ -301,6 +306,7 @@ function clearLines() {
         if (!grid[y].includes(0)) {
             grid.splice(y, 1);
             grid.unshift([0,0,0,0,0,0,0,0,0,0]);
+            score += 100;
         }
     }
 }
