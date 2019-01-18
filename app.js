@@ -56,7 +56,7 @@ let shapes = {
   }
 };
 
-let shapeKeys = Object.keys(shapes);
+let shapeKeyBag = [];
 let currentShape;
 let nextShape;
 let height = 15;
@@ -68,6 +68,7 @@ let move = 0;
 let occupiedBlocks = [];
 let direction = "";
 let score = 0;
+
 function resetGrid() {
     return [
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -103,7 +104,7 @@ let grid = resetGrid();
 
 const vectorMap = {
     "left": { y: 0, x: -1, edge: 0},
-    "right": { y: 0, x: 1, edge: grid.length},
+    "right": { y: 0, x: 1, edge: grid[0].length - 1},
     "down": { y: 1, x: 0, edge: grid.length - 1}
 };
 
@@ -145,8 +146,26 @@ pauseButton.addEventListener("click", () => {
   gameRunning = false;
 });
 
+function replenishShapeBag() {
+    return shuffle(Object.keys(shapes));
+}
+
+function shuffle(array) {
+    let m = array.length, t, i;
+    while (m) {
+        i = Math.floor(Math.random() * m--);
+        t = array[m];
+        array[m] = array[i];
+        array[i] = t;
+    }
+    return array;
+}
+
 function createShape() {
-    let shape = shapeKeys[Math.floor(Math.random() * shapeKeys.length)];
+    if (!shapeKeyBag.length) {
+        shapeKeyBag = replenishShapeBag();        
+    }
+    let shape = shapeKeyBag.pop();
     let location = [0, center];
 
     shapes[shape].startingIndices.forEach(coord => {
