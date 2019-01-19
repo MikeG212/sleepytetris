@@ -175,6 +175,9 @@ function drawWorld() {
     let square;
     for (let y = 0; y < grid.length; y++) {
         for (let x = 0; x < grid[y].length; x++) {
+            if (y < 2) {
+                continue;
+            }
             square = document.createElement('div');
             square.classList.add("empty");
             square.style.backgroundColor = colorMap[grid[y][x] % 10];
