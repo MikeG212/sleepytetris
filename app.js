@@ -1,4 +1,6 @@
-let world = document.getElementById('world')
+let world = document.getElementById('world');
+
+let next = document.getElementById("next");
 let colorMap = {
     0: "black",
     1: "red",
@@ -23,13 +25,13 @@ let shapes = {
   },
 
   t: {
-    startingIndices: [[0, 0], [1, 0], [2, 0], [1, 1]],
+    startingIndices: [[1, 0], [0, 1], [1, 1], [1, 2]],
     val: 2,
     
   },
 
   line: {
-    startingIndices: [[0, 0], [1, 0], [2, 0], [3, 0]],
+    startingIndices: [[0, 0], [0, 1], [0, 2], [0, 3]],
     val: 3,
   },
 
@@ -39,12 +41,12 @@ let shapes = {
   },
 
   l: {
-    startingIndices: [[0, 0], [1, 0], [2, 0], [0, 1]],
+    startingIndices: [[0, 0], [1, 0], [1, 1], [1, 2]],
     val: 5,
   },
 
   reverseL: {
-    startingIndices: [[2, 1], [1, 1], [0, 0], [0, 1]],
+    startingIndices: [[1, 0], [1, 1], [1, 2], [0, 2]],
     val: 6,
   },
 
@@ -58,7 +60,7 @@ let shapes = {
   }
 };
 
-let shapeKeyBag = [];
+let shapeKeyBag = replenishShapeBag();
 let currentShape;
 let nextShape;
 let height = 15;
@@ -73,17 +75,6 @@ let score = 0;
 
 function resetGrid() {
     return [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -123,6 +114,9 @@ document.onkeydown = function (e) {
             break;
         case 37:
             direction = "left";
+            break;
+        case 38:
+            direction = "up";
             break;
         case 39:
             direction = "right";
@@ -166,10 +160,13 @@ function shuffle(array) {
 }
 
 function createShape() {
-    if (!shapeKeyBag.length) {
-        shapeKeyBag = replenishShapeBag();        
+    setNext();
+    if (shapeKeyBag.length < 4) {
+        let nextShapes = replenishShapeBag();
+        shapeKeyBag = shapeKeyBag.concat(nextShapes);        
     }
-    let shape = shapeKeyBag.pop();
+    let shape = shapeKeyBag.shift();
+    console.log(shapeKeyBag);
     let location = [0, center];
 
     shapes[shape].startingIndices.forEach(coord => {
@@ -210,12 +207,16 @@ function moveOver(vector, y, x) {
     }
 }
 
+function setNext() {
+    next.innerHTML = `Next: ${shapeKeyBag.slice(0,4)}`;
+}
+
 function moveShapes(direction) {
     let canMove = true
     let vector = vectorMap[direction];
     switch (direction) {
         case "up":
-            rotateShape();
+            rotateCW();
             break;
         case "space":
             hardDown();
