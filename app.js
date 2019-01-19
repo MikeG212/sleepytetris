@@ -18,7 +18,7 @@ let scoreBoard = document.getElementById('scoreBoard');
 let gameRunning = true;
 
 let shapes = {
-  box: {
+  o: {
     startingIndices: [[0, 0], [0, 1], [1, 0], [1, 1]],
     val: 1,
 
@@ -30,39 +30,33 @@ let shapes = {
     
   },
 
-  line: {
+  i: {
     startingIndices: [[0, 0], [0, 1], [0, 2], [0, 3]],
     val: 3,
   },
 
-  t: {
-    startingIndices: [[0, 0], [1, 0], [2, 0], [1, 1]],
+  l: {
+    startingIndices: [[0, 0], [1, 0], [1, 1], [1, 2]],
     val: 4,
   },
 
-  l: {
-    startingIndices: [[0, 0], [1, 0], [1, 1], [1, 2]],
-    val: 5,
-  },
-
-  reverseL: {
+  j: {
     startingIndices: [[1, 0], [1, 1], [1, 2], [0, 2]],
-    val: 6,
+    val: 5,
   },
 
   s: {
     startingIndices: [[1, 0], [2, 0], [1, 1], [0, 1]],
-    val: 7,
+    val: 6,
   },
   z: {
     startingIndices: [[0, 0], [1, 0], [1, 1], [2, 1]],
-    val: 8,
+    val: 7,
   }
 };
 
 let shapeKeyBag = replenishShapeBag();
 let currentShape;
-let nextShape;
 let height = 15;
 let width = 10;
 let center = Math.floor(width / 2);
@@ -104,7 +98,6 @@ const vectorMap = {
 
 
 document.onkeydown = function (e) {
-    console.log(e.keyCode);
     let direction;
     e.preventDefault();
     switch (e.keyCode) {
@@ -165,12 +158,12 @@ function createShape() {
         let nextShapes = replenishShapeBag();
         shapeKeyBag = shapeKeyBag.concat(nextShapes);        
     }
-    let shape = shapeKeyBag.shift();
+    let currentShape = shapeKeyBag.shift();
     console.log(shapeKeyBag);
     let location = [0, center];
 
-    shapes[shape].startingIndices.forEach(coord => {
-        grid[location[0] + coord[0]][location[1] + coord[1]] = shapes[shape].val;
+    shapes[currentShape].startingIndices.forEach(coord => {
+        grid[location[0] + coord[0]][location[1] + coord[1]] = shapes[currentShape].val;
     })
 }
 
@@ -199,6 +192,7 @@ function drawWorld() {
 function containsLiveBlock(y, x) {
     return grid[y][x] > 0 && grid[y][x] < 10;
 }
+
 
 function moveOver(vector, y, x) {
     if (containsLiveBlock(y, x)) {
@@ -300,6 +294,10 @@ function freeze() {
 
 function hardDown() {
 
+}
+
+function rotateCW() {
+    currentShape
 }
 
 function clearLines() {
