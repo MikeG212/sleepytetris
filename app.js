@@ -66,6 +66,7 @@ let move = 0;
 let occupiedBlocks = [];
 let direction = "";
 let score = 0;
+let gameOver = false;
 
 function resetGrid() {
     return [
@@ -283,6 +284,13 @@ function moveShapes(direction) {
     }
 }
 
+function gameOverCheck() {
+    if (grid[0].filter(cell => !!cell).length || grid[1].filter(cell => !!cell).length) {
+        gameOver = true;
+        alert("GAME OVER");
+    }
+}
+
 function freeze() {
     for (let y = 0; y < grid.length; y++) {
         for (let x = 0; x < grid[y].length; x++) {
@@ -292,6 +300,7 @@ function freeze() {
         }
     }
     clearLines();
+    gameOverCheck();
     createShape();
 }
 
