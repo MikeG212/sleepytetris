@@ -14,46 +14,77 @@ let colorMap = {
 
 }
 
+const threeByThreeCW =
+    [[{y: 0, x: 2}, {y: 1, x: 1}, { y: 2, x: 2}],
+    [{y: -1, x: 1}, {y: 0, x: 0}, { y: 1, x: -1}],
+    [{y: -2, x: 0}, {y: -1, x: -1}, {y: 0, x: -2}]];
+
 let scoreBoard = document.getElementById('scoreBoard');
 let gameRunning = true;
 
-let shapes = {
-  o: {
-    startingIndices: [[0, 0], [0, 1], [1, 0], [1, 1]],
-    val: 1,
+const SHAPES = {
+    o: {
+        startingIndices: [[0, 0], [0, 1], [1, 0], [1, 1]],
+        val: 1,
+        width: 2,
 
-  },
+    },
 
-  t: {
-    startingIndices: [[1, 0], [0, 1], [1, 1], [1, 2]],
-    val: 2,
-    
-  },
+    t: {
+        startingIndices: [[1, 0], [0, 1], [1, 1], [1, 2]],
+        val: 2,
+        width: 3,
 
-  i: {
-    startingIndices: [[0, 0], [0, 1], [0, 2], [0, 3]],
-    val: 3,
-  },
+    },
 
-  l: {
-    startingIndices: [[0, 0], [1, 0], [1, 1], [1, 2]],
-    val: 4,
-  },
+    i: {
+        startingIndices: [[0, 0], [0, 1], [0, 2], [0, 3]],
+        val: 3,
+        width: 4,
+    },
 
-  j: {
-    startingIndices: [[1, 0], [1, 1], [1, 2], [0, 2]],
-    val: 5,
-  },
+    l: {
+        startingIndices: [[0, 0], [1, 0], [1, 1], [1, 2]],
+        val: 4,
+        width: 3,
+    },
 
-  s: {
-    startingIndices: [[1, 0], [2, 0], [1, 1], [0, 1]],
-    val: 6,
-  },
-  z: {
-    startingIndices: [[0, 0], [1, 0], [1, 1], [2, 1]],
-    val: 7,
-  }
+    j: {
+        startingIndices: [[1, 0], [1, 1], [1, 2], [0, 2]],
+        val: 5,
+        width: 3,
+    },
+
+    s: {
+        startingIndices: [[1, 0], [2, 0], [1, 1], [0, 1]],
+        val: 6,
+        width: 3,
+    },
+    z: {
+        startingIndices: [[0, 0], [1, 0], [1, 1], [2, 1]],
+        val: 7,
+        width: 3,
+    }
 };
+
+function deepDup(arr) {
+    return arr.map(el => {
+        if (el instanceof Array) {
+            return deepDup(el)
+        } else {
+            return el;
+        }
+    });
+
+}
+
+function Shape(shape) {
+    debugger
+    this.name = shape;
+    this.val = SHAPES[shape].val;
+    this.indices = deepDup(SHAPES[shape].startingIndices);
+    this.width = SHAPES[shape].width;
+}
 
 let shapeKeyBag = replenishShapeBag();
 let currentShape;
@@ -139,7 +170,7 @@ pauseButton.addEventListener("click", () => {
 });
 
 function replenishShapeBag() {
-    return shuffle(Object.keys(shapes));
+    return shuffle(Object.keys(SHAPES));
 }
 
 function shuffle(array) {
@@ -159,12 +190,16 @@ function createShape() {
         let nextShapes = replenishShapeBag();
         shapeKeyBag = shapeKeyBag.concat(nextShapes);        
     }
-    let currentShape = shapeKeyBag.shift();
-    console.log(shapeKeyBag);
+    currentShape = new Shape(shapeKeyBag.shift());
     let location = [0, center];
 
-    shapes[currentShape].startingIndices.forEach(coord => {
-        grid[location[0] + coord[0]][location[1] + coord[1]] = shapes[currentShape].val;
+    currentShape.indices.forEach(coord => {
+        debugger
+        newY = location[0] + coord[0];
+        newX = location[1] + coord[1];
+        grid[newY][newX] = currentShape.val;
+        coord[0] = newY;
+        coord[1] = newX;
     })
 }
 
@@ -200,6 +235,7 @@ function containsLiveBlock(y, x) {
 
 function moveOver(vector, y, x) {
     if (containsLiveBlock(y, x)) {
+        debugger
         grid[y + vector.y][x + vector.x] = grid[y][x];
         grid[y][x] = 0;
     }
@@ -207,6 +243,13 @@ function moveOver(vector, y, x) {
 
 function setNext() {
     next.innerHTML = `Next: ${shapeKeyBag.slice(0,4)}`;
+}
+
+function incrementCoord(y, x) {
+    currentShape.indices.forEach(coord => {
+        coord[0] += y;
+        coord[1] += x;
+    })
 }
 
 function moveShapes(direction) {
@@ -235,7 +278,8 @@ function moveShapes(direction) {
                     for (let x = 0; x < grid[y].length; x++) {
                         moveOver(vector, y, x);
                         }
-                    }
+                }
+                incrementCoord(vector.y, vector.x);
             }
             break;
         
@@ -255,7 +299,8 @@ function moveShapes(direction) {
                     for (let x = grid[y].length; x >= 0; x--) {
                             moveOver(vector, y, x);
                         }
-                    }
+                }
+                incrementCoord(vector.y, vector.x);
             }
             break;
 
@@ -276,6 +321,7 @@ function moveShapes(direction) {
                         moveOver(vector, y, x);
                     }
                 }
+                incrementCoord(vector.y, vector.x);
             }
             break;
 
@@ -309,15 +355,33 @@ function hardDown() {
 }
 
 function rotateCW() {
-    currentShape
+    locateShape()
 }
 
 function clearLines() {
     for (let y = 0; y < grid.length; y++) {
+        counter = 0;
         if (!grid[y].includes(0)) {
+            counter++;
             grid.splice(y, 1);
             grid.unshift([0,0,0,0,0,0,0,0,0,0]);
+            
+        }
+        switch (counter) {
+          case 1:
             score += 100;
+            break;
+          case 2:
+            score += 250;
+            break;
+          case 3:
+            score += 400;
+            break;
+          case 4:
+            score += 500;
+            break;
+          default:
+            break;
         }
     }
 }
@@ -325,11 +389,11 @@ function clearLines() {
 function gameLoop() {
     drawWorld();
     moveShapes("down");
+    debugger
     setTimeout(gameLoop, 500);
 }
 
 function start() {
-    drawWorld();
     createShape();
     gameLoop();
 
