@@ -212,9 +212,9 @@ function createMatrix(width, height) {
 
 function merge(grid, currentPiece) {
     currentPiece.matrix.forEach((row, y) => {
-        row.forEach((value, x) => {
-            if (value) {
-                grid[y + currentPiece.pos.y][x + currentPiece.pos.x] = value;
+        row.forEach((val, x) => {
+            if (val) {
+                grid[y + currentPiece.pos.y][x + currentPiece.pos.x] = val;
             }
         });
     });
@@ -222,9 +222,9 @@ function merge(grid, currentPiece) {
 
 function drawMatrix(matrix, offset) {
     matrix.forEach((row, y) => {
-        row.forEach((value, x) => {
-            if (value) {
-                context.fillStyle = colorMap[value];
+        row.forEach((val, x) => {
+            if (val) {
+                context.fillStyle = colorMap[val];
                 context.fillRect(x + offset.x, y + offset.y, 1, 1)
             }
         });
@@ -233,9 +233,9 @@ function drawMatrix(matrix, offset) {
 
 function drawGrid(matrix, offset) {
   matrix.forEach((row, y) => {
-    row.forEach((value, x) => {
-      if (value >= 0) {
-        context.fillStyle = colorMap[value];
+    row.forEach((val, x) => {
+      if (val >= 0) {
+        context.fillStyle = colorMap[val];
         context.fillRect(x + offset.x, y + offset.y, 1, 1);
       }
     });
