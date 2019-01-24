@@ -1,9 +1,16 @@
 const canvas = document.getElementById('tetris');
 const context = canvas.getContext('2d');
 const scoreBoard = document.getElementById("scoreBoard");
+const next = document.getElementById("next")
+
 let score = 0;
-const pieces = "ITOLSZJ".split("");
+const colorMap = ["black", "red", "orange", "yellow", "green", "teal", "indigo", "pink"]
+
 let shapeBag = replenishShapeBag();
+
+function setNext() {
+    next.innerHTML = `Next: ${shapeBag.slice(0, 4)}`;
+}
 
 function shuffle(array) {
   let m = array.length,
@@ -19,10 +26,20 @@ function shuffle(array) {
 }
 
 function replenishShapeBag() {
-    return shuffle(pieces);
+    return shuffle("ITOLSZJ".split(""));
 }
 
 context.scale(20, 20);
+
+function randomType() {
+    const type = shapeBag.shift();
+    if (shapeBag.length < 4) {
+      shapeBag = shapeBag.concat(replenishShapeBag());
+    }
+    setNext();
+    
+    return type;
+}
 
 function createPiece(type) {
     debugger
@@ -128,7 +145,7 @@ function drawMatrix(matrix, offset) {
     matrix.forEach((row, y) => {
         row.forEach((value, x) => {
             if (value) {
-                context.fillStyle = "red";
+                context.fillStyle = colorMap[value];
                 context.fillRect(x + offset.x, y + offset.y, 1, 1)
             }
         });
@@ -149,21 +166,46 @@ function update(time = 0) {
     requestAnimationFrame(update);
 }
 
+function clearLines() {
+    counter = 0;
+    for (let y = 0; y < arena.length; y++) {   
+        if (!arena[y].includes(0)) {
+            counter++;
+            const row = arena.splice(y, 1)[0].fill(0);
+            arena.unshift(row);
+        }
+    }
+    
+    switch (counter) {
+        case 1:
+            score += 100;
+            break;
+        case 2:
+            score += 250;
+            break;
+        case 3:
+            score += 400;
+            break;
+        case 4:
+            score += 500;
+            break;
+        default:
+            break;
+    }
+}
+
 function playerDrop() {
     player.pos.y++;
     if (collide(arena, player)) {
         player.pos.y--;
         merge(arena, player);
+        clearLines();
         resetPiece();
     }
     dropCounter = 0;
 }
 function resetPiece() {
-    debugger;
-    player.matrix = createPiece(shapeBag.shift());
-    if (shapeBag.length < 4) {
-        shapeBag += replenishShapeBag();
-    }
+    player.matrix = createPiece(randomType());
     player.pos.y = 0;
     player.pos.x = (arena[0].length / 2 | 0) - 
                     (player.matrix[0].length / 2 | 0);
@@ -246,7 +288,7 @@ document.onkeydown = function(e) {
 
 const player = {
     pos: { x: 5, y: 5 },
-    matrix: createPiece("T"),
+    matrix: createPiece(randomType()),
 };
 
 update();
