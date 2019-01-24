@@ -1,15 +1,11 @@
 * {
-    border: 1px dotted red;
+    background: navy;
+    color: white;
+    font-family: sans-serif;
+    font-size: 14;
+    text-align: center;
 }
-.empty {
-    width: 20px;
-    height: 20px;
-    background-color: black;
-    display: inline-block;
-}
-.squareShape {
-    width: 20px;
-    height: 20px;
-    outline: 2px solid black;
-    display: inline-block;
+#tetris {
+    border: solid .2em white;
+    height: 80vh;
 }

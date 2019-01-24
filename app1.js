@@ -210,7 +210,9 @@ function resetPiece() {
     player.pos.x = (arena[0].length / 2 | 0) - 
                     (player.matrix[0].length / 2 | 0);
     if (collide(arena, player)) {
+        alert("Game Over");
         arena.forEach(row => row.fill(0));
+        score = 0;
     }
 }
 
@@ -287,9 +289,10 @@ document.onkeydown = function(e) {
 
 
 const player = {
-    pos: { x: 5, y: 5 },
+    pos: { x: 5, y: 0 },
     matrix: createPiece(randomType()),
 };
 
+resetPiece();
 update();
 
