@@ -7,7 +7,7 @@ let running = true;
 let pauseButton = document.getElementById("pause-button");
 pauseButton.addEventListener("click", () => {
     running = !running;
-    if (pauseButton.innerHTML === "Pause") {
+    if (!running) {
         pauseButton.innerHTML = "Resume";
     } else {
         pauseButton.innerHTML = "Pause";
@@ -44,8 +44,8 @@ context.scale(20, 20);
 
 function randomType() {
     const type = shapeBag.shift();
-    if (shapeBag.length < 4) {
-      shapeBag = shapeBag.concat(replenishShapeBag());
+    if (shapeBag.length < 7) {
+        shapeBag = shapeBag.concat(replenishShapeBag()).concat(replenishShapeBag());
     }
     setNext();
     
@@ -160,6 +160,17 @@ function drawMatrix(matrix, offset) {
         });
     });
 }
+
+// function drawArena(matrix, offset) {
+//   matrix.forEach((row, y) => {
+//     row.forEach((value, x) => {
+//       if (value >= 0 && row > 2) {
+//         context.fillStyle = colorMap[value];
+//         context.fillRect(x + offset.x, y + offset.y, 1, 1);
+//       }
+//     });
+//   });
+// }
 let dropCounter = 0;
 let dropInterval = 200;
 let lastTime = 0;
@@ -325,6 +336,7 @@ function updateScore() {
 function hardDrop() {
     while (keepHardDropping) {
         playerDrop();
+        score++;
     }
 
 }
