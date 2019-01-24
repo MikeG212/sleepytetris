@@ -21,75 +21,33 @@ let scoreBoard = document.getElementById('scoreBoard');
 let gameRunning = true;
 
 const SHAPES = {
-    o: {
-        pos1: [[0, 0], [0, 1], [1, 0], [1, 1]],
-        pos2: [[0, 0], [0, 1], [1, 0], [1, 1]],
-        pos3: [[0, 0], [0, 1], [1, 0], [1, 1]],
-        pos4: [[0, 0], [0, 1], [1, 0], [1, 1]],
-        val: 1,
-        width: 2,
-        origin: [0, 0],
-    },
+    o: [[1, 1], 
+        [1, 1]],
 
-    t: {
-        pos1: [[1, 0], [1, 1], [0, 1], [1, 2]],
-        pos2: [[0, 1], [1,1], [1,2], [2, 1]],
-        pos3: [[1, 0], [1, 1], [1, 2], [2, 1]],
-        pos4: [[1, 0], [1, 1], [0, 1], [2, 1]],
-        val: 2,
-        width: 3,
-        origin: [0,0],
+    t: [[2, 2, 2]
+        [0, 2, 0],
+        [0, 0, 0]],
 
-    },
+    i: [[3, 3, 3, 3],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]],
 
-    i: {
-        pos1: [[0, 0], [0, 1], [0, 2], [0, 3]],
-        pos2: [[0, 3], [1, 3], [2, 3], [3, 3]],
-        pos3: [[3, 0], [3, 1], [3, 2], [3,3]],
-        pos4: [[0, 0], [1, 0], [2, 0], [3, 0]],
-        val: 3,
-        width: 4,
-        origin: [0, 0],
-    },
+    l: [[4, 4, 4]
+        [4, 0, 0],
+        [0, 0, 0]],
 
-    l: {
-        pos1: [[1, 0], [1, 1], [1, 2], [0, 2]],
-        pos2: [[0, 1], [1, 1], [2, 1], [2, 2]],
-        pos3: [[2, 0], [1, 1], [2, 0], [1, 2]],
-        pos4: [[0, 0], [0, 1], [1, 1], [2, 1]],
-        val: 4,
-        width: 3,
-        origin: [0,0],
-    },
+    l: [[5, 5, 5]
+        [0, 0, 5],
+        [0, 0, 0]],
 
-    j: {
-        pos1: [[0, 0], [1, 0], [1, 1], [1, 2]],
-        pos2: [[0, 1], [1, 1], [0, 2], [2, 1]],
-        pos3: [[1, 0], [1, 1], [1, 2], [1, 3]],
-        pos4: [[0, 0], [0, 1], [1, 1], [2, 1]],
-        val: 5,
-        width: 3,
-        origin: [0, 0],
-    },
+    s: [[0, 6, 6]
+        [6, 6, 0],
+        [0, 0, 0]],
 
-    s: {
-        pos1: [[1, 0], [1, 1], [0, 1], [0, 2]],
-        pos2: [[0, 1], [1, 1], [1, 2], [2, 2]],
-        pos3: [[2, 0], [2, 1], [1, 1], [1, 2]],
-        pos4: [[0, 0], [1, 0], [1, 1], [2, 1]],
-        val: 6,
-        width: 3,
-        origin: [0, 0],
-    },
-    z: {
-        pos1: [[0, 0], [0, 1], [1, 1], [1, 2]],
-        pos2: [[0, 2], [1, 2], [1, 1], [2, 1]],
-        pos3: [[2, 2], [2, 1], [1, 1], [1, 0]],
-        pos4: [[0, 1], [1, 1], [1, 0], [2, 0]],
-        val: 7,
-        width: 3,
-        origin: [0, 0],
-    }
+    z: [[7, 7, 0]
+        [0, 7, 7],
+        [0, 0, 0]],
 };
 
 function deepDup(arr) {
@@ -112,15 +70,7 @@ function incrementCoord(y, x) {
   currentShape.origin[1] += x
 }
 
-function Shape(shape) {
-    debugger
-    this.name = shape;
-    this.config = configs[0];
-    this.val = SHAPES[shape].val;
-    this.indices = deepDup(SHAPES[shape].pos1);
-    this.width = SHAPES[shape].width;
-    this.origin = deepDup(SHAPES[shape].origin);
-}
+
 
 let shapeKeyBag = replenishShapeBag();
 let currentShape;
@@ -222,8 +172,8 @@ function createShape() {
         let nextShapes = replenishShapeBag();
         shapeKeyBag = shapeKeyBag.concat(nextShapes);        
     }
-    currentShape = new Shape(shapeKeyBag.shift());
-    let location = [0, center];
+    currentShape = SHAPES[shapeKeyBag.shift()];
+    let start = [0, center];
 
     currentShape.indices.forEach(coord => {
         newY = location[0] + coord[0];
@@ -233,7 +183,7 @@ function createShape() {
         coord[1] = newX;
     })
     debugger
-    currentShape.origin[0] = 0;
+
     currentShape.origin[1] += center;
 }
 
