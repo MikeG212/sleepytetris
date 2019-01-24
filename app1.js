@@ -2,6 +2,17 @@ const canvas = document.getElementById('tetris');
 const context = canvas.getContext('2d');
 const scoreBoard = document.getElementById("scoreBoard");
 const next = document.getElementById("next")
+let running = true;
+
+let pauseButton = document.getElementById("pause-button");
+pauseButton.addEventListener("click", () => {
+    running = !running;
+    if (pauseButton.innerHTML === "Pause") {
+        pauseButton.innerHTML = "Resume";
+    } else {
+        pauseButton.innerHTML = "Pause";
+    }
+});
 
 let score = 0;
 const colorMap = ["black", "red", "orange", "yellow", "green", "teal", "indigo", "pink"]
@@ -59,10 +70,10 @@ function createPiece(type) {
             break;
         case "I":
             return [
-                [3, 3, 3, 3],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0]
+                [3, 0, 0, 0],
+                [3, 0, 0, 0],
+                [3, 0, 0, 0],
+                [3, 0, 0, 0]
             ];
             break;
         case "L":
@@ -128,8 +139,6 @@ function createMatrix(width, height) {
 }
 
 const arena = createMatrix(12,20);
-console.log(arena);
-console.table(arena);
 
 function merge(arena, player) {
     player.matrix.forEach((row, y) => {
@@ -152,14 +161,14 @@ function drawMatrix(matrix, offset) {
     });
 }
 let dropCounter = 0;
-let dropInterval = 1000;
+let dropInterval = 200;
 let lastTime = 0;
 
 function update(time = 0) {
     const deltaTime = time - lastTime;
     lastTime = time;
     dropCounter += deltaTime;
-    if (dropCounter > dropInterval) {
+    if (dropCounter > dropInterval && running) {
         playerDrop();
     }
     draw();
@@ -173,6 +182,11 @@ function clearLines() {
             counter++;
             const row = arena.splice(y, 1)[0].fill(0);
             arena.unshift(row);
+            if (dropInterval > 100) {
+                dropInterval -= 50;
+            } else if (dropInterval > 50) {
+                dropInterval -=5;
+            }
         }
     }
     
@@ -194,10 +208,14 @@ function clearLines() {
     }
 }
 
+let keepHardDropping;
+
 function playerDrop() {
+    keepHardDropping = true;
     player.pos.y++;
     if (collide(arena, player)) {
         player.pos.y--;
+        keepHardDropping = false;
         merge(arena, player);
         clearLines();
         resetPiece();
@@ -211,10 +229,22 @@ function resetPiece() {
                     (player.matrix[0].length / 2 | 0);
     if (collide(arena, player)) {
         alert("Game Over");
-        arena.forEach(row => row.fill(0));
-        score = 0;
+        resetGame();
     }
 }
+function resetGame() {
+    arena.forEach(row => row.fill(0));
+    resetPiece();
+    score = 0;
+    updateScore();
+    dropInterval = 200;
+    
+}
+
+let resetButton = document.getElementById("reset-button");
+resetButton.addEventListener("click", () => {
+  resetGame()
+});
 
 function playerMove(dir) {
     player.pos.x += dir;
@@ -224,6 +254,7 @@ function playerMove(dir) {
 }
 
 function playerRotate(dir) {
+    debugger
     const pos = player.pos.x;
     let offset = 1;
     rotate(player.matrix, dir)
@@ -273,6 +304,7 @@ document.onkeydown = function(e) {
       playerMove(1);
       break;
     case 32: //space
+      hardDrop();
       break;
     case 81: //up
       playerRotate(1);
@@ -283,9 +315,19 @@ document.onkeydown = function(e) {
     default:
       break;
   }
-  scoreBoard.innerHTML = `Score: ${score}`;
+  updateScore();
 };
 
+function updateScore() {
+    scoreBoard.innerHTML = `Score: ${score}`;
+}
+
+function hardDrop() {
+    while (keepHardDropping) {
+        playerDrop();
+    }
+
+}
 
 
 const player = {
