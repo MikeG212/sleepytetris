@@ -3,6 +3,9 @@ const context = canvas.getContext('2d');
 const scoreBoard = document.getElementById("scoreBoard");
 const next = document.getElementById("next")
 let running = true;
+const grid = createMatrix(12, 20);
+let midpoint = (grid[0].length / 2) | 0;
+let isI;
 
 let pauseButton = document.getElementById("pause-button");
 pauseButton.addEventListener("click", () => {
@@ -15,7 +18,7 @@ pauseButton.addEventListener("click", () => {
 });
 
 let score = 0;
-const colorMap = ["black", "red", "orange", "yellow", "green", "teal", "indigo", "pink"]
+const colorMap = ["black", "red", "orange", "yellow", "green", "teal", "indigo", "pink", "white"]
 
 let shapeBag = replenishShapeBag();
 
@@ -38,6 +41,7 @@ function shuffle(array) {
 
 function replenishShapeBag() {
     return shuffle("ITOLSZJ".split(""));
+    return shuffle("IIIIIII".split(""));
 }
 
 context.scale(20, 20);
@@ -53,6 +57,7 @@ function randomType() {
 }
 
 function createPiece(type) {
+    type === "I" ? isI = true : isI = false;
     debugger
     switch (type) {
         case "T":
@@ -73,7 +78,8 @@ function createPiece(type) {
                 [3, 0, 0, 0],
                 [3, 0, 0, 0],
                 [3, 0, 0, 0],
-                [3, 0, 0, 0]
+                [3, 0, 0, 0],
+
             ];
             break;
         case "L":
@@ -112,17 +118,17 @@ function createPiece(type) {
 function draw() {
     context.fillStyle = "#000";
     context.fillRect(0, 0, canvas.width, canvas.height);
-    drawMatrix(arena, {x: 0, y: 0});
+    drawGrid(grid, {x: 0, y: 0});
     drawMatrix(player.matrix, player.pos);
 }
 
-function collide(arena, player) {
+function collide(grid, player) {
     const [matrix, pos] = [player.matrix, player.pos]
     for (let y = 0; y < matrix.length; y++) {
         for (let x = 0; x < matrix[y].length; x++) {
             if (matrix[y][x] &&
-                (arena[y + pos.y] &&
-                arena[y + pos.y][x + pos.x]) !== 0) {
+                (grid[y + pos.y] &&
+                grid[y + pos.y][x + pos.x]) !==0) {
                 return true;
             }
         }
@@ -138,13 +144,13 @@ function createMatrix(width, height) {
     return matrix;
 }
 
-const arena = createMatrix(12,20);
 
-function merge(arena, player) {
+
+function merge(grid, player) {
     player.matrix.forEach((row, y) => {
         row.forEach((value, x) => {
             if (value) {
-                arena[y + player.pos.y][x + player.pos.x] = value;
+                grid[y + player.pos.y][x + player.pos.x] = value;
             }
         });
     });
@@ -161,24 +167,26 @@ function drawMatrix(matrix, offset) {
     });
 }
 
-// function drawArena(matrix, offset) {
-//   matrix.forEach((row, y) => {
-//     row.forEach((value, x) => {
-//       if (value >= 0 && row > 2) {
-//         context.fillStyle = colorMap[value];
-//         context.fillRect(x + offset.x, y + offset.y, 1, 1);
-//       }
-//     });
-//   });
-// }
+function drawGrid(matrix, offset) {
+  debugger
+  matrix.forEach((row, y) => {
+    row.forEach((value, x) => {
+      if (value >= 0) {
+        context.fillStyle = colorMap[value];
+        context.fillRect(x + offset.x, y + offset.y, 1, 1);
+      }
+    });
+  });
+}
 let dropCounter = 0;
-let dropInterval = 200;
+let dropInterval = 250;
 let lastTime = 0;
 
 function update(time = 0) {
     const deltaTime = time - lastTime;
     lastTime = time;
     dropCounter += deltaTime;
+    updateScore();
     if (dropCounter > dropInterval && running) {
         playerDrop();
     }
@@ -188,11 +196,11 @@ function update(time = 0) {
 
 function clearLines() {
     counter = 0;
-    for (let y = 0; y < arena.length; y++) {   
-        if (!arena[y].includes(0)) {
+    for (let y = 0; y < grid.length; y++) {   
+        if (!grid[y].includes(0)) {
             counter++;
-            const row = arena.splice(y, 1)[0].fill(0);
-            arena.unshift(row);
+            const row = grid.splice(y, 1)[0].fill(0);
+            grid.unshift(row);
             if (dropInterval > 100) {
                 dropInterval -= 50;
             } else if (dropInterval > 50) {
@@ -224,31 +232,30 @@ let keepHardDropping;
 function playerDrop() {
     keepHardDropping = true;
     player.pos.y++;
-    if (collide(arena, player)) {
+    if (collide(grid, player)) {
         player.pos.y--;
         keepHardDropping = false;
-        merge(arena, player);
+        merge(grid, player);
         clearLines();
         resetPiece();
     }
     dropCounter = 0;
 }
 function resetPiece() {
-    player.matrix = createPiece(randomType());
+    player.type = randomType();
+    player.matrix = createPiece(player.type);
     player.pos.y = 0;
-    player.pos.x = (arena[0].length / 2 | 0) - 
-                    (player.matrix[0].length / 2 | 0);
-    if (collide(arena, player)) {
+    player.pos.x = midpoint - (player.matrix[0].length / 2 | 0);
+    if (collide(grid, player)) {
         alert("Game Over");
         resetGame();
     }
 }
 function resetGame() {
-    arena.forEach(row => row.fill(0));
+    grid.forEach(row => row.fill(0));
     resetPiece();
     score = 0;
-    updateScore();
-    dropInterval = 200;
+    dropInterval = 1500;
     
 }
 
@@ -259,17 +266,28 @@ resetButton.addEventListener("click", () => {
 
 function playerMove(dir) {
     player.pos.x += dir;
-    if (collide(arena, player)) {
-        player.pos.x -= dir;
+    if (collide(grid, player)) {
+       player.pos.x -= dir;
     }
 }
 
 function playerRotate(dir) {
-    debugger
     const pos = player.pos.x;
     let offset = 1;
     rotate(player.matrix, dir)
-    while (collide(arena, player)) {
+    while (collide(grid, player)) {
+        debugger
+        if (isI) {
+            debugger
+            player.matrix.forEach(row => row.reverse());
+            console.log(player.pos.x)
+            if (player.pos.x <= 0) {
+                player.pos.x = -1;
+            } else {
+                player.pos.x -= 4;
+            }
+        }
+        console.log(player.type);
         player.pos.x += offset;
         offset = -(offset + (offset > 0 ? 1 : -1));
         if (offset > player.matrix[0].length) {
@@ -317,16 +335,15 @@ document.onkeydown = function(e) {
     case 32: //space
       hardDrop();
       break;
-    case 81: //up
+    case 81: //q
       playerRotate(1);
       break;
-    case 87: //up
+    case 87: //w
       playerRotate(-1);
       break;
     default:
       break;
   }
-  updateScore();
 };
 
 function updateScore() {
@@ -343,8 +360,8 @@ function hardDrop() {
 
 
 const player = {
-    pos: { x: 5, y: 0 },
-    matrix: createPiece(randomType()),
+  pos: { x: midpoint, y: 0 },
+  matrix: createPiece(randomType())
 };
 
 resetPiece();
