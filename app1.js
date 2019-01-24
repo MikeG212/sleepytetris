@@ -276,18 +276,14 @@ function playerRotate(dir) {
     let offset = 1;
     rotate(player.matrix, dir)
     while (collide(grid, player)) {
-        debugger
         if (isI) {
-            debugger
             player.matrix.forEach(row => row.reverse());
-            console.log(player.pos.x)
             if (player.pos.x <= 0) {
                 player.pos.x = -1;
             } else {
                 player.pos.x -= 4;
             }
         }
-        console.log(player.type);
         player.pos.x += offset;
         offset = -(offset + (offset > 0 ? 1 : -1));
         if (offset > player.matrix[0].length) {
@@ -321,6 +317,9 @@ function rotate(matrix, dir) {
 
 document.onkeydown = function(e) {
   e.preventDefault();
+  if (!running) {
+    return;
+  }
   switch (e.keyCode) {
     case 40: //down
       playerDrop();
@@ -360,7 +359,7 @@ function hardDrop() {
 
 
 const player = {
-  pos: { x: midpoint, y: 0 },
+  pos: { x: midpoint, y: -2 },
   matrix: createPiece(randomType())
 };
 
