@@ -6,6 +6,31 @@ let running = true;
 const grid = createMatrix(12, 20);
 let midpoint = (grid[0].length / 2) | 0;
 let isI;
+let score = 0;
+const colorMap = [
+  "black",
+  "red",
+  "orange",
+  "yellow",
+  "green",
+  "teal",
+  "indigo",
+  "pink",
+  "white"
+];
+let shapeBag = replenishShapeBag().concat(replenishShapeBag());
+let dropCounter = 0;
+let dropInterval = 250;
+let lastTime = 0;
+let keepHardDropping = true;
+let gameOver = false;
+
+context.scale(20, 20);
+
+const player = {
+    pos: { x: midpoint, y: -2 },
+    matrix: createPiece(randomType())
+};
 
 let pauseButton = document.getElementById("pause-button");
 pauseButton.addEventListener("click", () => {
@@ -17,10 +42,55 @@ pauseButton.addEventListener("click", () => {
     }
 });
 
-let score = 0;
-const colorMap = ["black", "red", "orange", "yellow", "green", "teal", "indigo", "pink", "white"]
+let resetButton = document.getElementById("reset-button");
+resetButton.addEventListener("click", () => {
+    resetGame()
+});
 
-let shapeBag = replenishShapeBag();
+function resetGame() {
+    grid.forEach(row => row.fill(0));
+    resetPiece();
+    score = 0;
+    dropInterval = 250;
+    gameOver = false;
+    canvas.style.opacity = 1;
+    running = true;
+    resetButton.innerHTML = "Reset";
+
+}
+
+document.onkeydown = function (e) {
+    if (gameOver) {
+        resetGame();
+    }
+    e.preventDefault();
+    if (!running) {
+        return;
+    }
+    switch (e.keyCode) {
+        case 40: //down
+            playerDrop();
+            score++;
+            break;
+        case 37: //left
+            playerMove(-1);
+            break;
+        case 39: //right
+            playerMove(1);
+            break;
+        case 32: //space
+            hardDrop();
+            break;
+        case 38: //q
+            playerRotate(1);
+            break;
+        case 87: //w
+            playerRotate(-1);
+            break;
+        default:
+            break;
+    }
+};
 
 function setNext() {
     next.innerHTML = `Next: ${shapeBag.slice(0, 4)}`;
@@ -40,11 +110,10 @@ function shuffle(array) {
 }
 
 function replenishShapeBag() {
+    return shuffle("IIIIIIII".split(""));
     return shuffle("ITOLSZJ".split(""));
-    return shuffle("IIIIIII".split(""));
+    
 }
-
-context.scale(20, 20);
 
 function randomType() {
     const type = shapeBag.shift();
@@ -58,7 +127,6 @@ function randomType() {
 
 function createPiece(type) {
     type === "I" ? isI = true : isI = false;
-    debugger
     switch (type) {
         case "T":
             return [
@@ -66,50 +134,50 @@ function createPiece(type) {
                 [1, 1, 1],
                 [0, 1, 0]
             ];
-            break;
+            // break;
         case "O":
             return [
                 [2, 2],
                 [2, 2]
             ];
-            break;
+            // break;
         case "I":
             return [
-                [3, 0, 0, 0],
-                [3, 0, 0, 0],
-                [3, 0, 0, 0],
-                [3, 0, 0, 0],
+                [0, 0, 0, 0],
+                [3, 3, 3, 3],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
 
             ];
-            break;
+            // break;
         case "L":
             return [
                 [4, 4, 4],
                 [4, 0, 0],
                 [0, 0, 0]
             ];
-            break;
+            // break;
         case "J":
             return [
                 [5, 5, 5],
                 [0, 0, 5],
                 [0, 0, 0]
             ];
-            break;
+            // break;
         case "S":
             return [
                 [0, 6, 6],
                 [6, 6, 0],
                 [0, 0, 0]
             ];
-            break;
+            // break;
         case "Z":
             return [
                 [7, 7, 0],
                 [0, 7, 7],
                 [0, 0, 0]
             ];
-            break;    
+            // break;    
         default:
             break;
     }
@@ -144,8 +212,6 @@ function createMatrix(width, height) {
     return matrix;
 }
 
-
-
 function merge(grid, player) {
     player.matrix.forEach((row, y) => {
         row.forEach((value, x) => {
@@ -168,7 +234,6 @@ function drawMatrix(matrix, offset) {
 }
 
 function drawGrid(matrix, offset) {
-  debugger
   matrix.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value >= 0) {
@@ -178,9 +243,6 @@ function drawGrid(matrix, offset) {
     });
   });
 }
-let dropCounter = 0;
-let dropInterval = 250;
-let lastTime = 0;
 
 function update(time = 0) {
     const deltaTime = time - lastTime;
@@ -204,7 +266,7 @@ function clearLines() {
             if (dropInterval > 100) {
                 dropInterval -= 50;
             } else if (dropInterval > 50) {
-                dropInterval -=5;
+                dropInterval -= 10;
             }
         }
     }
@@ -227,14 +289,14 @@ function clearLines() {
     }
 }
 
-let keepHardDropping;
-
 function playerDrop() {
     keepHardDropping = true;
     player.pos.y++;
     if (collide(grid, player)) {
         player.pos.y--;
         keepHardDropping = false;
+        dropCounter -= 100;
+        dropInterval -= 1;
         merge(grid, player);
         clearLines();
         resetPiece();
@@ -247,50 +309,22 @@ function resetPiece() {
     player.pos.y = 0;
     player.pos.x = midpoint - (player.matrix[0].length / 2 | 0);
     if (collide(grid, player)) {
-        alert("Game Over");
-        resetGame();
+        player.pos.y -= 1;
+        endGame();
     }
 }
-function resetGame() {
-    grid.forEach(row => row.fill(0));
-    resetPiece();
-    score = 0;
-    dropInterval = 1500;
-    
-}
 
-let resetButton = document.getElementById("reset-button");
-resetButton.addEventListener("click", () => {
-  resetGame()
-});
+function endGame() {
+    canvas.style.opacity = .5;
+    gameOver = true;
+    running = false;
+    resetButton.innerHTML = "New Game";
+}
 
 function playerMove(dir) {
     player.pos.x += dir;
     if (collide(grid, player)) {
        player.pos.x -= dir;
-    }
-}
-
-function playerRotate(dir) {
-    const pos = player.pos.x;
-    let offset = 1;
-    rotate(player.matrix, dir)
-    while (collide(grid, player)) {
-        if (isI) {
-            player.matrix.forEach(row => row.reverse());
-            if (player.pos.x <= 0) {
-                player.pos.x = -1;
-            } else {
-                player.pos.x -= 4;
-            }
-        }
-        player.pos.x += offset;
-        offset = -(offset + (offset > 0 ? 1 : -1));
-        if (offset > player.matrix[0].length) {
-            rotate(player.matrix, -dir)
-            player.pos.x = pos;
-            return;
-        }
     }
 }
 
@@ -314,36 +348,29 @@ function rotate(matrix, dir) {
     }
 }
 
-
-document.onkeydown = function(e) {
-  e.preventDefault();
-  if (!running) {
-    return;
+function playerRotate(dir) {
+  const pos = player.pos.x;
+  let offset = 1;
+  rotate(player.matrix, dir);
+  while (collide(grid, player)) {
+      debugger
+    if (isI) {
+      player.matrix.forEach(row => row.reverse());
+      if (player.pos.x <= 0) {
+        player.pos.x = -1;
+      } else {
+        player.pos.x = 7;
+      }
+    }
+    player.pos.x += offset;
+    offset = -(offset + (offset > 0 ? 1 : -1));
+    if (offset > player.matrix[0].length) {
+      rotate(player.matrix, -dir);
+      player.pos.x = pos;
+      return;
+    }
   }
-  switch (e.keyCode) {
-    case 40: //down
-      playerDrop();
-      score++;
-      break;
-    case 37: //left
-      playerMove(-1);
-      break;
-    case 39: //right
-      playerMove(1);
-      break;
-    case 32: //space
-      hardDrop();
-      break;
-    case 81: //q
-      playerRotate(1);
-      break;
-    case 87: //w
-      playerRotate(-1);
-      break;
-    default:
-      break;
-  }
-};
+}
 
 function updateScore() {
     scoreBoard.innerHTML = `Score: ${score}`;
@@ -357,12 +384,6 @@ function hardDrop() {
 
 }
 
-
-const player = {
-  pos: { x: midpoint, y: -2 },
-  matrix: createPiece(randomType())
-};
-
-resetPiece();
+resetGame();
 update();
 
