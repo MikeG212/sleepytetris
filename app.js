@@ -56,7 +56,7 @@ function resetGame() {
     canvas.style.opacity = 1;
     running = true;
     resetButton.innerHTML = "Reset";
-
+    shapeBag = replenishShapeBag().concat(replenishShapeBag());
 }
 
 document.onkeydown = function (e) {
@@ -132,13 +132,11 @@ function createPiece(type) {
                 [1, 1, 1],
                 [0, 1, 0]
             ];
-            // break;
         case "O":
             return [
                 [2, 2],
                 [2, 2]
             ];
-            // break;
         case "I":
             return [
                 [0, 0, 0, 0],
@@ -147,35 +145,30 @@ function createPiece(type) {
                 [0, 0, 0, 0],
 
             ];
-            // break;
         case "L":
             return [
                 [4, 4, 4],
                 [4, 0, 0],
                 [0, 0, 0]
             ];
-            // break;
         case "J":
             return [
                 [5, 5, 5],
                 [0, 0, 5],
                 [0, 0, 0]
             ];
-            // break;
         case "S":
             return [
                 [0, 6, 6],
                 [6, 6, 0],
                 [0, 0, 0]
             ];
-            // break;
         case "Z":
             return [
                 [7, 7, 0],
                 [0, 7, 7],
                 [0, 0, 0]
-            ];
-            // break;    
+            ];    
         default:
             break;
     }
@@ -341,7 +334,7 @@ function rotate(matrix, dir) {
     }
 
     if (dir > 0) {
-        matrix.forEach(row => row.reverse())
+        matrix.forEach(row => row.reverse());
     } else {
         matrix.reverse();
     }
