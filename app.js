@@ -2,10 +2,10 @@ const canvas = document.getElementById("tetris");
 const context = canvas.getContext("2d");
 const scoreBoard = document.getElementById("scoreBoard");
 const next = document.getElementById("next");
+const nextContext = next.getContext("2d");
 let running = true;
 const grid = createMatrix(12, 20);
 let midpoint = (grid[0].length / 2) | 0;
-let isI;
 let score = 0;
 const colorMap = [
   "black",
@@ -18,18 +18,29 @@ const colorMap = [
   "pink",
   "white"
 ];
+const pieceMatrixHash = {
+  T: [[0, 0, 0], [1, 1, 1], [0, 1, 0]],
+  O: [[2, 2], [2, 2]],
+  I: [[0, 0, 0, 0], [3, 3, 3, 3], [0, 0, 0, 0], [0, 0, 0, 0]],
+  L: [[4, 4, 4], [4, 0, 0], [0, 0, 0]],
+  J: [[5, 5, 5], [0, 0, 5], [0, 0, 0]],
+  S: [[0, 6, 6], [6, 6, 0], [0, 0, 0]],
+  Z: [[7, 7, 0], [0, 7, 7], [0, 0, 0]]
+};
 let shapeBag = replenishShapeBag().concat(replenishShapeBag());
 let dropCounter = 0;
 let dropInterval = 250;
 let lastTime = 0;
 let keepHardDropping = true;
 let gameOver = false;
+let type = randomType;
 
 context.scale(20, 20);
 
 const currentPiece = {
   pos: { x: midpoint, y: -2 },
-  matrix: createPiece(randomType())
+  matrix: pieceMatrixHash[type],
+  type: type
 };
 
 let pauseButton = document.getElementById("pause-button");
@@ -92,8 +103,20 @@ document.onkeydown = function(e) {
   }
 };
 
-function setNext() {
-  next.innerHTML = `Next: ${shapeBag.slice(0, 4)}`;
+function setNext(type) {
+  debugger;
+  const nextGrid = createMatrix(6, 6);
+
+  const nextPiece = {
+    pos: { x: 3, y: 2 },
+    matrix: pieceMatrixHash[type],
+    type: type
+  };
+  nextContext.fillStyle = "#FFFFFF";
+  nextContext.fillRect(0, 0, 400, 400);
+  merge(nextGrid, nextPiece);
+  drawGrid(nextGrid, { x: 0, y: 0 }, nextContext);
+  drawMatrix(nextPiece.matrix, nextPiece.pos);
 }
 
 function shuffle(array) {
@@ -118,36 +141,13 @@ function randomType() {
   if (shapeBag.length < 7) {
     shapeBag = shapeBag.concat(replenishShapeBag()).concat(replenishShapeBag());
   }
-  setNext();
   return type;
-}
-
-function createPiece(type) {
-  type === "I" ? (isI = true) : (isI = false);
-  switch (type) {
-    case "T":
-      return [[0, 0, 0], [1, 1, 1], [0, 1, 0]];
-    case "O":
-      return [[2, 2], [2, 2]];
-    case "I":
-      return [[0, 0, 0, 0], [3, 3, 3, 3], [0, 0, 0, 0], [0, 0, 0, 0]];
-    case "L":
-      return [[4, 4, 4], [4, 0, 0], [0, 0, 0]];
-    case "J":
-      return [[5, 5, 5], [0, 0, 5], [0, 0, 0]];
-    case "S":
-      return [[0, 6, 6], [6, 6, 0], [0, 0, 0]];
-    case "Z":
-      return [[7, 7, 0], [0, 7, 7], [0, 0, 0]];
-    default:
-      break;
-  }
 }
 
 function draw() {
   context.fillStyle = "#000";
   context.fillRect(0, 0, canvas.width, canvas.height);
-  drawGrid(grid, { x: 0, y: 0 });
+  drawGrid(grid, { x: 0, y: 0 }, context);
   drawMatrix(currentPiece.matrix, currentPiece.pos);
 }
 
@@ -195,7 +195,8 @@ function drawMatrix(matrix, offset) {
   });
 }
 
-function drawGrid(matrix, offset) {
+function drawGrid(matrix, offset, context) {
+  debugger;
   matrix.forEach((row, y) => {
     row.forEach((val, x) => {
       if (val >= 0) {
@@ -226,7 +227,7 @@ function clearLines() {
       const row = grid.splice(y, 1)[0].fill(0);
       grid.unshift(row);
       if (dropInterval > 100) {
-        dropInterval -= 50;
+        dropInterval -= 25;
       } else if (dropInterval > 50) {
         dropInterval -= 10;
       }
@@ -267,14 +268,17 @@ function drop() {
   dropCounter = 0;
 }
 function resetPiece() {
+  debugger;
   currentPiece.type = randomType();
-  currentPiece.matrix = createPiece(currentPiece.type);
+  currentPiece.matrix = pieceMatrixHash[currentPiece.type];
   currentPiece.pos.y = 0;
   currentPiece.pos.x = midpoint - ((currentPiece.matrix[0].length / 2) | 0);
   if (collide(grid, currentPiece)) {
     currentPiece.pos.y -= 1;
     endGame();
   }
+  debugger;
+  setNext(shapeBag[0]);
 }
 
 function endGame() {
@@ -310,7 +314,7 @@ function currentPieceRotate(dir) {
   let offset = 1;
   rotate(currentPiece.matrix, dir);
   while (collide(grid, currentPiece)) {
-    if (isI) {
+    if (currentPiece.type === "I") {
       currentPiece.matrix.forEach(row => row.reverse());
       if (currentPiece.pos.x <= 0) {
         currentPiece.pos.x = -1;
