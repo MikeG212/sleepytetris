@@ -3,6 +3,9 @@ const context = canvas.getContext("2d");
 const scoreBoard = document.getElementById("scoreBoard");
 const next = document.getElementById("next");
 const nextContext = next.getContext("2d");
+
+nextContext.scale(10, 10);
+
 let running = true;
 const grid = createMatrix(12, 20);
 let midpoint = (grid[0].length / 2) | 0;
@@ -33,7 +36,7 @@ let dropInterval = 250;
 let lastTime = 0;
 let keepHardDropping = true;
 let gameOver = false;
-let type = randomType;
+let type = randomType();
 
 context.scale(20, 20);
 
@@ -42,6 +45,7 @@ const currentPiece = {
   matrix: pieceMatrixHash[type],
   type: type
 };
+setNext(shapeBag[0]);
 
 let pauseButton = document.getElementById("pause-button");
 pauseButton.addEventListener("click", () => {
@@ -112,11 +116,11 @@ function setNext(type) {
     matrix: pieceMatrixHash[type],
     type: type
   };
-  nextContext.fillStyle = "#FFFFFF";
-  nextContext.fillRect(0, 0, 400, 400);
+  nextContext.fillStyle = "#000";
+  nextContext.fillRect(0, 0, 100, 100);
   merge(nextGrid, nextPiece);
   drawGrid(nextGrid, { x: 0, y: 0 }, nextContext);
-  drawMatrix(nextPiece.matrix, nextPiece.pos);
+  drawGrid(nextPiece.matrix, nextPiece.pos, nextContext);
 }
 
 function shuffle(array) {
@@ -139,7 +143,7 @@ function replenishShapeBag() {
 function randomType() {
   const type = shapeBag.shift();
   if (shapeBag.length < 7) {
-    shapeBag = shapeBag.concat(replenishShapeBag()).concat(replenishShapeBag());
+    shapeBag = shapeBag.concat(replenishShapeBag());
   }
   return type;
 }
@@ -148,7 +152,7 @@ function draw() {
   context.fillStyle = "#000";
   context.fillRect(0, 0, canvas.width, canvas.height);
   drawGrid(grid, { x: 0, y: 0 }, context);
-  drawMatrix(currentPiece.matrix, currentPiece.pos);
+  drawGrid(currentPiece.matrix, currentPiece.pos, context);
 }
 
 function collide(grid, currentPiece) {
@@ -184,22 +188,11 @@ function merge(grid, currentPiece) {
   });
 }
 
-function drawMatrix(matrix, offset) {
-  matrix.forEach((row, y) => {
-    row.forEach((val, x) => {
-      if (val) {
-        context.fillStyle = colorMap[val];
-        context.fillRect(x + offset.x, y + offset.y, 0.97, 0.97);
-      }
-    });
-  });
-}
-
 function drawGrid(matrix, offset, context) {
   debugger;
   matrix.forEach((row, y) => {
     row.forEach((val, x) => {
-      if (val >= 0) {
+      if (val) {
         context.fillStyle = colorMap[val];
         context.fillRect(x + offset.x, y + offset.y, 0.97, 0.97);
       }
