@@ -4,7 +4,7 @@ const scoreBoard = document.getElementById("scoreBoard");
 const next = document.getElementById("next");
 const nextContext = next.getContext("2d");
 
-nextContext.scale(10, 10);
+nextContext.scale(15, 15);
 
 let running = true;
 const grid = createMatrix(12, 20);
@@ -22,7 +22,7 @@ const colorMap = [
   "white"
 ];
 const pieceMatrixHash = {
-  T: [[0, 0, 0], [1, 1, 1], [0, 1, 0]],
+  T: [[1, 1, 1], [0, 1, 0], [0, 0, 0]],
   O: [[2, 2], [2, 2]],
   I: [[0, 0, 0, 0], [3, 3, 3, 3], [0, 0, 0, 0], [0, 0, 0, 0]],
   L: [[4, 4, 4], [4, 0, 0], [0, 0, 0]],
@@ -30,13 +30,13 @@ const pieceMatrixHash = {
   S: [[0, 6, 6], [6, 6, 0], [0, 0, 0]],
   Z: [[7, 7, 0], [0, 7, 7], [0, 0, 0]]
 };
-let shapeBag = replenishShapeBag().concat(replenishShapeBag());
+let shapeBag;
 let dropCounter = 0;
 let dropInterval = 250;
 let lastTime = 0;
 let keepHardDropping = true;
 let gameOver = false;
-let type = randomType();
+let type;
 
 context.scale(20, 20);
 
@@ -45,7 +45,6 @@ const currentPiece = {
   matrix: pieceMatrixHash[type],
   type: type
 };
-setNext(shapeBag[0]);
 
 let pauseButton = document.getElementById("pause-button");
 pauseButton.addEventListener("click", () => {
@@ -63,7 +62,9 @@ resetButton.addEventListener("click", () => {
 });
 
 function resetGame() {
+  debugger;
   grid.forEach(row => row.fill(0));
+  shapeBag = replenishShapeBag().concat(replenishShapeBag());
   resetPiece();
   score = 0;
   dropInterval = 250;
@@ -71,7 +72,6 @@ function resetGame() {
   canvas.style.opacity = 1;
   running = true;
   resetButton.innerHTML = "Reset";
-  shapeBag = replenishShapeBag().concat(replenishShapeBag());
 }
 
 document.onkeydown = function(e) {
@@ -108,7 +108,6 @@ document.onkeydown = function(e) {
 };
 
 function setNext(type) {
-  debugger;
   const nextGrid = createMatrix(6, 6);
 
   const nextPiece = {
@@ -119,8 +118,7 @@ function setNext(type) {
   nextContext.fillStyle = "#000";
   nextContext.fillRect(0, 0, 100, 100);
   merge(nextGrid, nextPiece);
-  drawGrid(nextGrid, { x: 0, y: 0 }, nextContext);
-  drawGrid(nextPiece.matrix, nextPiece.pos, nextContext);
+  drawGrid(nextGrid, { x: -1, y: -1 }, nextContext);
 }
 
 function shuffle(array) {

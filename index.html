@@ -6,23 +6,20 @@
   </head>
 
   <body>
-    <h3>Tetris</h3>
-    <aside>
-      <div id="instructions">
-        up: clockwise turn<br />w: ccw turn<br />spacebar: hard drop
-      </div>
-      <br />
-      <div id="scoreBoard">Score:</div>
-      <button id="reset-button">Reset</button>
-      <button id="pause-button">Pause</button>
-      <canvas
-        id="next"
-        width="100"
-        height="100"
-        style="cursor: inherit;"
-      ></canvas>
-    </aside>
-    <canvas id="tetris" width="240" height="400"></canvas>
+    <div id="game-container">
+      <aside>
+        <h3 id="title">Sleepy Tetris</h3>
+
+        <div class="aside-div" id="instructions">
+          up: clockwise turn<br />w: ccw turn<br />spacebar: hard drop
+        </div>
+        <div class="aside-div" id="scoreBoard">Score:</div>
+        <button id="reset-button">Reset</button>
+        <button id="pause-button">Pause</button>
+        <canvas id="next" width="100" height="100"></canvas>
+      </aside>
+      <canvas id="tetris" width="240" height="400"></canvas>
+    </div>
     <script type="application/javascript" src="./app.js"></script>
   </body>
 </html>

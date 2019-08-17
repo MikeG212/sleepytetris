@@ -1,15 +1,42 @@
 * {
   background-image: url("starwars.jpg");
+  background-size: cover;
+  overflow: hidden;
   color: white;
   font-family: sans-serif;
   font-size: 14;
   text-align: center;
+  margin: 0;
 }
-#tetris {
+
+#game-container {
+  display: flex;
+  align-items: flex-start;
+  padding: 40px;
+  margin: 0 auto;
+  max-width: 900px;
+}
+
+canvas {
   border: solid 0.2em white;
+  background-color: black;
+}
+
+#tetris {
   height: 75vh;
 }
 
+#next {
+  margin-top: 20px;
+}
+
 aside {
-  float: right;
+  width: 100%;
+  max-width: 200px;
+  display: block;
+  padding: 0 20px;
+}
+
+.aside-div {
+  margin: 20px;
 }
