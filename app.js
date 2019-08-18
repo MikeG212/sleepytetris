@@ -215,9 +215,7 @@ function clearLines() {
       counter++;
       const row = grid.splice(y, 1)[0].fill(0);
       grid.unshift(row);
-      if (dropInterval > 100) {
-        dropInterval -= 25;
-      } else if (dropInterval > 50) {
+      if (dropInterval > 75) {
         dropInterval -= 10;
       }
     }
