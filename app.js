@@ -62,7 +62,6 @@ resetButton.addEventListener("click", () => {
 });
 
 function resetGame() {
-  debugger;
   grid.forEach(row => row.fill(0));
   shapeBag = replenishShapeBag().concat(replenishShapeBag());
   resetPiece();
@@ -187,7 +186,6 @@ function merge(grid, currentPiece) {
 }
 
 function drawGrid(matrix, offset, context) {
-  debugger;
   matrix.forEach((row, y) => {
     row.forEach((val, x) => {
       if (val) {
@@ -259,7 +257,6 @@ function drop() {
   dropCounter = 0;
 }
 function resetPiece() {
-  debugger;
   currentPiece.type = randomType();
   currentPiece.matrix = pieceMatrixHash[currentPiece.type];
   currentPiece.pos.y = 0;
@@ -268,7 +265,6 @@ function resetPiece() {
     currentPiece.pos.y -= 1;
     endGame();
   }
-  debugger;
   setNext(shapeBag[0]);
 }
 

@@ -2,7 +2,7 @@
   background-image: url("starwars.jpg");
   background-size: cover;
   overflow: hidden;
-  color: white;
+  color: gray;
   font-family: sans-serif;
   font-size: 14;
   text-align: center;
@@ -39,4 +39,19 @@ aside {
 
 .aside-div {
   margin: 20px;
+}
+
+table,
+th,
+td {
+  border: 1px solid grey;
+  text-align: left;
+}
+
+td {
+  padding: 5px;
+}
+
+#scoreBoard {
+  font-size: 150%;
 }
