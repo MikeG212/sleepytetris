@@ -19,7 +19,7 @@ const colorMap = [
   "teal",
   "indigo",
   "pink",
-  "white"
+  "brown"
 ];
 const pieceMatrixHash = {
   T: [[1, 1, 1], [0, 1, 0], [0, 0, 0]],
@@ -69,9 +69,9 @@ function resetGame() {
   resetPiece();
   score = 0;
   dropInterval = 250;
-  pauseButton.style.opacity = 1;
+  pauseButton.style.opacity = 0.7;
   gameOver = false;
-  canvas.style.opacity = 1;
+  canvas.style.opacity = 0.7;
   running = true;
   resetButton.innerHTML = "Reset";
 }
@@ -271,7 +271,7 @@ function resetPiece() {
 
 function endGame() {
   canvas.style.opacity = 0.5;
-  pauseButton.style.opacity = 0.5;
+  pauseButton.style.opacity = 0.25;
   gameOver = true;
   running = false;
   resetButton.innerHTML = "New Game";
