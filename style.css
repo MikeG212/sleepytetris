@@ -55,3 +55,7 @@ td {
 #scoreBoard {
   font-size: 150%;
 }
+
+#resetButton {
+  display: inline-block;
+}

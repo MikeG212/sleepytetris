@@ -48,11 +48,13 @@ const currentPiece = {
 
 let pauseButton = document.getElementById("pause-button");
 pauseButton.addEventListener("click", () => {
-  running = !running;
-  if (!running) {
-    pauseButton.innerHTML = "Resume";
-  } else {
-    pauseButton.innerHTML = "Pause";
+  if (!gameOver) {
+    running = !running;
+    if (!running) {
+      pauseButton.innerHTML = "Resume";
+    } else {
+      pauseButton.innerHTML = "Pause";
+    }
   }
 });
 
@@ -67,6 +69,7 @@ function resetGame() {
   resetPiece();
   score = 0;
   dropInterval = 250;
+  pauseButton.style.opacity = 1;
   gameOver = false;
   canvas.style.opacity = 1;
   running = true;
@@ -268,6 +271,7 @@ function resetPiece() {
 
 function endGame() {
   canvas.style.opacity = 0.5;
+  pauseButton.style.opacity = 0.5;
   gameOver = true;
   running = false;
   resetButton.innerHTML = "New Game";
