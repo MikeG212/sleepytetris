@@ -1,3 +1,14 @@
+let shapeBag;
+let type;
+
+let midpoint = (grid[0].length / 2) | 0;
+
+const currentPiece = {
+  pos: { x: midpoint, y: -2 },
+  matrix: pieceMatrixHash[type],
+  type: type
+};
+
 function shuffle(array) {
   let m = array.length,
     t,

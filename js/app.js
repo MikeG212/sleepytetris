@@ -1,25 +1,10 @@
-const canvas = document.getElementById("tetris");
-const context = canvas.getContext("2d");
-
 let running = true;
-const grid = createMatrix(12, 20);
-let midpoint = (grid[0].length / 2) | 0;
 
-let shapeBag;
 let dropCounter = 0;
 let dropInterval = 250;
 let lastTime = 0;
 let keepHardDropping = true;
 let gameOver = false;
-let type;
-
-context.scale(20, 20);
-
-const currentPiece = {
-  pos: { x: midpoint, y: -2 },
-  matrix: pieceMatrixHash[type],
-  type: type
-};
 
 function resetGame() {
   grid.forEach(row => row.fill(0));
@@ -54,14 +39,6 @@ function collide(grid, currentPiece) {
     }
   }
   return false;
-}
-
-function createMatrix(width, height) {
-  const matrix = [];
-  while (matrix.length < height) {
-    matrix.push(new Array(width).fill(0));
-  }
-  return matrix;
 }
 
 function merge(grid, currentPiece) {

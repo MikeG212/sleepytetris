@@ -1,4 +1,15 @@
+const canvas = document.getElementById("tetris");
+const context = canvas.getContext("2d");
+const grid = createMatrix(12, 20);
 context.scale(20, 20);
+
+function createMatrix(width, height) {
+  const matrix = [];
+  while (matrix.length < height) {
+    matrix.push(new Array(width).fill(0));
+  }
+  return matrix;
+}
 
 function draw() {
   context.fillStyle = "#000";
