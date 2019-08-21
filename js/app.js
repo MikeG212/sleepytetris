@@ -1,37 +1,10 @@
 const canvas = document.getElementById("tetris");
 const context = canvas.getContext("2d");
-const scoreBoard = document.getElementById("scoreBoard");
-const next = document.getElementById("next");
-const nextContext = next.getContext("2d");
-const pauseButton = document.getElementById("pause-button");
-const resetButton = document.getElementById("reset-button");
-
-nextContext.scale(15, 15);
 
 let running = true;
 const grid = createMatrix(12, 20);
 let midpoint = (grid[0].length / 2) | 0;
-let score = 0;
-const colorMap = [
-  "black",
-  "red",
-  "orange",
-  "yellow",
-  "green",
-  "teal",
-  "indigo",
-  "pink",
-  "brown"
-];
-const pieceMatrixHash = {
-  T: [[1, 1, 1], [0, 1, 0], [0, 0, 0]],
-  O: [[2, 2], [2, 2]],
-  I: [[0, 0, 0, 0], [3, 3, 3, 3], [0, 0, 0, 0], [0, 0, 0, 0]],
-  L: [[4, 4, 4], [4, 0, 0], [0, 0, 0]],
-  J: [[5, 5, 5], [0, 0, 5], [0, 0, 0]],
-  S: [[0, 6, 6], [6, 6, 0], [0, 0, 0]],
-  Z: [[7, 7, 0], [0, 7, 7], [0, 0, 0]]
-};
+
 let shapeBag;
 let dropCounter = 0;
 let dropInterval = 250;
@@ -54,50 +27,11 @@ function resetGame() {
   resetPiece();
   score = 0;
   dropInterval = 250;
-  pauseButton.style.opacity = 0.7;
+  pauseButton.style.opacity = 1;
   gameOver = false;
   canvas.style.opacity = 0.7;
   running = true;
   resetButton.innerHTML = "Reset";
-}
-
-function setNext(type) {
-  const nextGrid = createMatrix(6, 6);
-
-  const nextPiece = {
-    pos: { x: 3, y: 2 },
-    matrix: pieceMatrixHash[type],
-    type: type
-  };
-  nextContext.fillStyle = "#000";
-  nextContext.fillRect(0, 0, 100, 100);
-  merge(nextGrid, nextPiece);
-  drawGrid(nextGrid, { x: -1, y: -1 }, nextContext);
-}
-
-function shuffle(array) {
-  let m = array.length,
-    t,
-    i;
-  while (m) {
-    i = Math.floor(Math.random() * m--);
-    t = array[m];
-    array[m] = array[i];
-    array[i] = t;
-  }
-  return array;
-}
-
-function replenishShapeBag() {
-  return shuffle("ITOLSZJ".split(""));
-}
-
-function randomType() {
-  const type = shapeBag.shift();
-  if (shapeBag.length < 7) {
-    shapeBag = shapeBag.concat(replenishShapeBag());
-  }
-  return type;
 }
 
 function draw() {
@@ -271,10 +205,6 @@ function currentPieceRotate(dir) {
       return;
     }
   }
-}
-
-function updateScore() {
-  scoreBoard.innerHTML = `Score: ${score}`;
 }
 
 function hardDrop() {

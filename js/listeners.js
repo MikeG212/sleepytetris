@@ -1,3 +1,6 @@
+const pauseButton = document.getElementById("pause-button");
+const resetButton = document.getElementById("reset-button");
+
 pauseButton.addEventListener("click", () => {
   if (!gameOver) {
     running = !running;
