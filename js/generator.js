@@ -33,3 +33,15 @@ function randomType() {
   }
   return type;
 }
+
+function resetPiece() {
+  currentPiece.type = randomType();
+  currentPiece.matrix = pieceMatrixHash[currentPiece.type];
+  currentPiece.pos.y = 0;
+  currentPiece.pos.x = midpoint - ((currentPiece.matrix[0].length / 2) | 0);
+  if (collide(grid, currentPiece)) {
+    currentPiece.pos.y -= 1;
+    endGame();
+  }
+  setNext(shapeBag[0]);
+}

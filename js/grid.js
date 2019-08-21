@@ -29,6 +29,17 @@ function drawGrid(matrix, offset, context) {
   });
 }
 
+function drawGrid(matrix, offset, context) {
+  matrix.forEach((row, y) => {
+    row.forEach((val, x) => {
+      if (val) {
+        context.fillStyle = colorMap[val];
+        context.fillRect(x + offset.x, y + offset.y, 0.97, 0.97);
+      }
+    });
+  });
+}
+
 function setNext(type) {
   const nextGrid = createMatrix(6, 6);
 
@@ -124,15 +135,58 @@ function drop() {
   dropCounter = 0;
 }
 
-function resetGame() {
-  grid.forEach(row => row.fill(0));
-  shapeBag = replenishShapeBag().concat(replenishShapeBag());
-  resetPiece();
-  score = 0;
-  dropInterval = 250;
-  pauseButton.style.opacity = 0.7;
-  gameOver = false;
-  canvas.style.opacity = 0.7;
-  running = true;
-  resetButton.innerHTML = "Reset";
+function clearLines() {
+  counter = 0;
+  for (let y = 0; y < grid.length; y++) {
+    if (!grid[y].includes(0)) {
+      counter++;
+      const row = grid.splice(y, 1)[0].fill(0);
+      grid.unshift(row);
+      if (dropInterval > 75) {
+        dropInterval -= 10;
+      }
+    }
+  }
+
+  switch (counter) {
+    case 1:
+      score += 100;
+      break;
+    case 2:
+      score += 250;
+      break;
+    case 3:
+      score += 400;
+      break;
+    case 4:
+      score += 500;
+      break;
+    default:
+      break;
+  }
+}
+
+function collide(grid, currentPiece) {
+  const [matrix, pos] = [currentPiece.matrix, currentPiece.pos];
+  for (let y = 0; y < matrix.length; y++) {
+    for (let x = 0; x < matrix[y].length; x++) {
+      if (
+        matrix[y][x] &&
+        (grid[y + pos.y] && grid[y + pos.y][x + pos.x]) !== 0
+      ) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function merge(grid, currentPiece) {
+  currentPiece.matrix.forEach((row, y) => {
+    row.forEach((val, x) => {
+      if (val) {
+        grid[y + currentPiece.pos.y][x + currentPiece.pos.x] = val;
+      }
+    });
+  });
 }
