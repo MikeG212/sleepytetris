@@ -3,6 +3,8 @@ const context = canvas.getContext("2d");
 const scoreBoard = document.getElementById("scoreBoard");
 const next = document.getElementById("next");
 const nextContext = next.getContext("2d");
+const pauseButton = document.getElementById("pause-button");
+const resetButton = document.getElementById("reset-button");
 
 nextContext.scale(15, 15);
 
@@ -46,23 +48,6 @@ const currentPiece = {
   type: type
 };
 
-let pauseButton = document.getElementById("pause-button");
-pauseButton.addEventListener("click", () => {
-  if (!gameOver) {
-    running = !running;
-    if (!running) {
-      pauseButton.innerHTML = "Resume";
-    } else {
-      pauseButton.innerHTML = "Pause";
-    }
-  }
-});
-
-let resetButton = document.getElementById("reset-button");
-resetButton.addEventListener("click", () => {
-  resetGame();
-});
-
 function resetGame() {
   grid.forEach(row => row.fill(0));
   shapeBag = replenishShapeBag().concat(replenishShapeBag());
@@ -75,39 +60,6 @@ function resetGame() {
   running = true;
   resetButton.innerHTML = "Reset";
 }
-
-document.onkeydown = function(e) {
-  if (gameOver) {
-    resetGame();
-  }
-  e.preventDefault();
-  if (!running) {
-    return;
-  }
-  switch (e.keyCode) {
-    case 40: //down
-      drop();
-      score++;
-      break;
-    case 37: //left
-      move(-1);
-      break;
-    case 39: //right
-      move(1);
-      break;
-    case 32: //space
-      hardDrop();
-      break;
-    case 38: //up
-      currentPieceRotate(1);
-      break;
-    case 87: //w
-      currentPieceRotate(-1);
-      break;
-    default:
-      break;
-  }
-};
 
 function setNext(type) {
   const nextGrid = createMatrix(6, 6);
@@ -328,9 +280,13 @@ function updateScore() {
 function hardDrop() {
   while (keepHardDropping) {
     drop();
-    score++;
+    score += 10;
   }
 }
 
-resetGame();
-update();
+function startGame() {
+  resetGame();
+  update();
+}
+
+startGame();
