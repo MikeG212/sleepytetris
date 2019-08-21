@@ -63,6 +63,6 @@ function drop() {
 function hardDrop() {
   while (keepHardDropping) {
     drop();
-    score += 10;
+    score += 5;
   }
 }
